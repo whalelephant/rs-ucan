@@ -83,6 +83,7 @@ type CapabilitiesIterator<'a> = FlatMap<
 /// assert_eq!(resource.get("msg/receive").unwrap(), &vec![json!({})]);
 /// assert_eq!(resource.get("msg/send").unwrap(), &vec![json!({ "draft": true }), json!({ "publish": true, "topic": ["foo"] })])
 /// ```
+#[cfg_attr(feature = "onchain", derive(schemars::JsonSchema))]
 pub struct Capabilities(CapabilitiesImpl);
 
 impl Capabilities {

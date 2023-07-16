@@ -11,8 +11,10 @@ use anyhow::{anyhow, Result};
 use base64::Engine;
 use cid::multihash::Code;
 use log::warn;
-use rand::Rng;
 use serde::{de::DeserializeOwned, Serialize};
+
+#[cfg(not(feature = "onchain"))]
+use rand::Rng;
 
 /// A signable is a UCAN that has all the state it needs in order to be signed,
 /// but has not yet been signed.
@@ -49,6 +51,7 @@ where
     }
 
     /// The payload field components of the UCAN JWT
+    #[cfg(not(feature = "onchain"))]
     pub async fn ucan_payload(&self) -> Result<UcanPayload> {
         let nonce = match self.add_nonce {
             true => Some(
@@ -85,6 +88,7 @@ where
 
     /// Produces a Ucan, which contains finalized UCAN fields along with signed
     /// data suitable for encoding as a JWT token string
+    #[cfg(not(feature = "onchain"))]
     pub async fn sign(&self) -> Result<Ucan> {
         let header = self.ucan_header();
         let payload = self

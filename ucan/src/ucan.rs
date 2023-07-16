@@ -20,12 +20,14 @@ pub const UCAN_VERSION: &str = "0.10.0-canary";
 pub type FactsMap = BTreeMap<String, Value>;
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "onchain", derive(schemars::JsonSchema))]
 pub struct UcanHeader {
     pub alg: String,
     pub typ: String,
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "onchain", derive(schemars::JsonSchema))]
 pub struct UcanPayload {
     pub ucv: String,
     pub iss: String,
@@ -43,6 +45,7 @@ pub struct UcanPayload {
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "onchain", derive(schemars::JsonSchema))]
 pub struct Ucan {
     header: UcanHeader,
     payload: UcanPayload,
