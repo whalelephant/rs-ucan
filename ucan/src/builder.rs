@@ -1,12 +1,14 @@
 use std::collections::BTreeMap;
 
+#[cfg(not(feature = "onchain"))]
+use crate::time::now;
 use crate::{
     capability::{proof::ProofDelegationSemantics, Capability, CapabilitySemantics},
     crypto::KeyMaterial,
     serde::Base64Encode,
-    time::now,
     ucan::{FactsMap, Ucan, UcanHeader, UcanPayload, UCAN_VERSION},
 };
+
 use anyhow::{anyhow, Result};
 use base64::Engine;
 use cid::multihash::Code;
@@ -285,12 +287,18 @@ where
         Code::Blake3_256
     }
 
+    #[cfg(not(feature = "onchain"))]
     fn implied_expiration(&self) -> Option<u64> {
         if self.expiration.is_some() {
             self.expiration
         } else {
             self.lifetime.map(|lifetime| now() + lifetime)
         }
+    }
+
+    #[cfg(feature = "onchain")]
+    fn implied_expiration(&self) -> Option<u64> {
+        self.expiration
     }
 
     pub fn build(self) -> Result<Signable<'a, K>> {

@@ -77,6 +77,7 @@
 //! [DID Key spec]: https://w3c-ccg.github.io/did-method-key/
 
 pub mod crypto;
+#[cfg(not(feature = "onchain"))]
 pub mod time;
 
 pub mod builder;

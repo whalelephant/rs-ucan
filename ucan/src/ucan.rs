@@ -1,8 +1,9 @@
+#[cfg(not(feature = "onchain"))]
+use crate::time::now;
 use crate::{
     capability::Capabilities,
     crypto::did::DidParser,
     serde::{Base64Encode, DagJson},
-    time::now,
 };
 use anyhow::{anyhow, Result};
 use base64::Engine;
@@ -78,8 +79,11 @@ impl Ucan {
             return Err(anyhow!("Expired"));
         }
 
-        if self.is_too_early() {
-            return Err(anyhow!("Not active yet (too early)"));
+        #[cfg(not(feature = "onchain"))]
+        {
+            if self.is_too_early() {
+                return Err(anyhow!("Not active yet (too early)"));
+            }
         }
 
         self.check_signature(did_parser).await
@@ -103,9 +107,19 @@ impl Ucan {
     }
 
     /// Returns true if the UCAN has past its expiration date
+    #[cfg(not(feature = "onchain"))]
     pub fn is_expired(&self, now_time: Option<u64>) -> bool {
         if let Some(exp) = self.payload.exp {
             exp < now_time.unwrap_or_else(now)
+        } else {
+            false
+        }
+    }
+
+    #[cfg(feature = "onchain")]
+    pub fn is_expired(&self, now_time: Option<u64>) -> bool {
+        if let Some(exp) = self.payload.exp {
+            exp < now_time.unwrap()
         } else {
             false
         }
@@ -121,6 +135,7 @@ impl Ucan {
     }
 
     /// Returns true if the not-before ("nbf") time is still in the future
+    #[cfg(not(feature = "onchain"))]
     pub fn is_too_early(&self) -> bool {
         match self.payload.nbf {
             Some(nbf) => nbf > now(),
